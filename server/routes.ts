@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 import {
   insertClientSchema,
   insertExerciseSchema,
@@ -12,7 +11,6 @@ import {
   insertSetSchema,
   insertSharedWorkoutLinkSchema,
 } from "@shared/schema";
-import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Simple auth endpoint for compatibility (no auth required)

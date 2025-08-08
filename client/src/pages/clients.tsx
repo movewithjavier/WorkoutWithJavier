@@ -233,27 +233,33 @@ export default function Clients() {
                   </div>
                   
                   <div className="flex space-x-2">
-                    <Button 
-                      size="sm" 
-                      className="flex-1 bg-primary hover:bg-primary-dark text-white"
-                    >
-                      <i className="fas fa-play mr-2"></i>
-                      Start Workout
-                    </Button>
+                    <Link href={`/clients/${client.id}`}>
+                      <Button 
+                        size="sm" 
+                        className="flex-1 bg-primary hover:bg-primary-dark text-white"
+                      >
+                        <i className="fas fa-dumbbell mr-2"></i>
+                        Workouts
+                      </Button>
+                    </Link>
                     <Button 
                       size="sm" 
                       variant="outline"
                       className="text-gray-600 hover:text-gray-800"
+                      title="Share workout link"
                     >
                       <i className="fas fa-share-alt"></i>
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="text-gray-600 hover:text-gray-800"
-                    >
-                      <i className="fas fa-cog"></i>
-                    </Button>
+                    <Link href={`/clients/${client.id}`}>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="text-gray-600 hover:text-gray-800"
+                        title="Manage client"
+                      >
+                        <i className="fas fa-cog"></i>
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>

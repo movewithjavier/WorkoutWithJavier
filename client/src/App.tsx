@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Clients from "@/pages/clients";
+import ClientDetail from "@/pages/client-detail";
 import WorkoutSession from "@/pages/workout-session";
 import ClientWorkout from "@/pages/client-workout";
 
@@ -20,6 +21,7 @@ function Router() {
       {/* Main app routes (no auth required) */}
       <Route path="/" component={Dashboard} />
       <Route path="/clients" component={Clients} />
+      <Route path="/clients/:clientId" component={ClientDetail} />
       <Route path="/workout-session/:clientId/:templateId" component={WorkoutSession} />
       
       <Route component={NotFound} />

@@ -2,12 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import WorkoutSessionModal from "@/components/workout-session-modal";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const [selectedWorkout, setSelectedWorkout] = useState<{clientId: string, templateId: string, clientName: string, templateName: string} | null>(null);
 
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
@@ -47,14 +48,8 @@ export default function Dashboard() {
   }
 
   const handleStartWorkout = (client: any) => {
-    // For demo, we'll use the first template for the client
-    // In real implementation, we'd show a template selector
-    setSelectedWorkout({
-      clientId: client.id,
-      templateId: "demo-template-id",
-      clientName: client.name,
-      templateName: "Upper Body A"
-    });
+    // Navigate to client detail page to select workout template
+    navigate(`/clients/${client.id}`);
   };
 
   return (
