@@ -1,5 +1,8 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// API Base URL - defaults to same origin in development, uses env var in production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -7,12 +10,28 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+function getFullUrl(url: string): string {
+  // If URL already starts with http, return as-is
+  if (url.startsWith('http')) {
+    return url;
+  }
+  
+  // If we have an API base URL, use it
+  if (API_BASE_URL) {
+    return `${API_BASE_URL}${url}`;
+  }
+  
+  // Default to same origin (development)
+  return url;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const fullUrl = getFullUrl(url);
+  const res = await fetch(fullUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +48,8 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const fullUrl = getFullUrl(queryKey.join("/") as string);
+    const res = await fetch(fullUrl, {
       credentials: "include",
     });
 
