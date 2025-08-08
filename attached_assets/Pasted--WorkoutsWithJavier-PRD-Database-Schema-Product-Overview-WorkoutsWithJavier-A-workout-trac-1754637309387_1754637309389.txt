@@ -1,0 +1,208 @@
+# WorkoutsWithJavier - PRD & Database Schema
+
+## Product Overview
+WorkoutsWithJavier: A workout tracker app for personal trainers to track client workouts, showing previous performance data to inform current sessions.
+
+**App URL:** `workoutswithjavier.replit.app` (future: `workoutswithjavier.com`)
+
+## Core Use Case
+When starting a workout with a client, display their last recorded sets, reps, and weights for each exercise to guide progression and maintain consistency.
+
+## Database Schema
+
+### 1. Exercises Table
+```sql
+exercises
+- id (primary key)
+- name (e.g., "Dumbbell Chest Press")
+- category (e.g., "Chest", "Legs", "Back")
+- video_url (optional)
+- instructions (text)
+- created_at
+- updated_at
+```
+
+### 2. Clients Table
+```sql
+clients
+- id (primary key)
+- name
+- email (optional)
+- phone (optional)
+- notes (optional)
+- created_at
+- updated_at
+```
+
+### 3. Workout Templates Table
+```sql
+workout_templates
+- id (primary key)
+- client_id (foreign key)
+- name (e.g., "John's Upper Body A")
+- is_active (boolean)
+- created_at
+- updated_at
+```
+
+### 4. Template Exercises Table
+```sql
+template_exercises
+- id (primary key)
+- workout_template_id (foreign key)
+- exercise_id (foreign key)
+- order_index (for exercise order)
+- target_sets (optional suggestion)
+- target_reps (optional suggestion)
+- notes (optional)
+```
+
+### 5. Workouts Table (Historical Records)
+```sql
+workouts
+- id (primary key)
+- client_id (foreign key)
+- workout_template_id (foreign key, optional)
+- date
+- duration_minutes (optional)
+- notes (optional)
+- created_at
+- updated_at
+```
+
+### 6. Workout Exercises Table
+```sql
+workout_exercises
+- id (primary key)
+- workout_id (foreign key)
+- exercise_id (foreign key)
+- order_index
+- notes (optional)
+```
+
+### 7. Sets Table
+```sql
+sets
+- id (primary key)
+- workout_exercise_id (foreign key)
+- set_number (1, 2, 3, etc.)
+- reps
+- weight_kg
+- rest_seconds (optional)
+- rpe (rate of perceived exertion, optional)
+- notes (optional)
+```
+
+### 8. Shared Workout Links Table
+```sql
+shared_workout_links
+- id (primary key)
+- client_id (foreign key)
+- workout_template_id (foreign key)
+- unique_token (UUID/random string)
+- expires_at (timestamp)
+- is_used (boolean)
+- created_at
+- updated_at
+```
+
+## Key Features
+
+### Shareable Client Workout Flow
+1. **Generate Link**: Trainer creates shareable workout link for specific client/template
+2. **Send to Client**: Client receives URL like `yourapp.com/workout/abc123xyz`
+3. **Client Access**: No login required - token validates access
+4. **Show Last Performance**: Display their previous sets/reps/weights
+5. **Client Input**: Simple form to input today's performance
+6. **Auto-Save**: Submits directly to database as completed workout
+7. **One-Time Use**: Link expires after use or time limit
+
+### Primary Flow
+1. **Start Workout**: Select client and workout template
+2. **Show Last Performance**: For each exercise, display previous sets/reps/weights
+3. **Record Current Workout**: Input today's sets, reps, weights
+4. **Save & Progress**: Store data and show progression over time
+
+### Data Retrieval Logic
+To show "last known sets and reps" for John's Dumbbell Chest Press:
+```sql
+SELECT s.set_number, s.reps, s.weight_kg, w.date
+FROM sets s
+JOIN workout_exercises we ON s.workout_exercise_id = we.id
+JOIN workouts w ON we.workout_id = w.id
+JOIN exercises e ON we.exercise_id = e.id
+WHERE w.client_id = [john_id] 
+  AND e.name = 'Dumbbell Chest Press'
+ORDER BY w.date DESC, s.set_number ASC
+LIMIT [number_of_sets_from_last_workout]
+```
+
+## MVP Features
+- [ ] Create/manage clients
+- [ ] Create/manage workout templates
+- [ ] Start workout session
+- [ ] Display last performance data
+- [ ] Record sets/reps/weights
+- [ ] Save workout history
+- [ ] Basic progression tracking
+- [ ] **Generate shareable client workout links**
+- [ ] **Client-facing workout submission page**
+
+## Future Enhancements
+- [ ] Exercise video integration
+- [ ] Progress charts/analytics
+- [ ] Rest timer
+- [ ] RPE tracking
+- [ ] Exercise substitutions
+- [ ] Client mobile access
+- [ ] Workout scheduling
+- [ ] Body measurements tracking
+
+## Technical Implementation for Shareable Links
+
+### Link Generation Logic
+```javascript
+// When trainer creates shareable link
+const shareableLink = {
+  client_id: clientId,
+  workout_template_id: templateId,
+  unique_token: generateUUID(), // or crypto.randomBytes(32).toString('hex')
+  expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  is_used: false
+}
+```
+
+### Client Page Route
+```
+GET workoutswithjavier.replit.app/workout/:token
+- Validate token exists and not expired
+- Load client info and workout template
+- Display last performance data
+- Show input form for today's workout
+
+POST workoutswithjavier.replit.app/workout/:token
+- Validate token (mark as used)
+- Create new workout record
+- Save all sets/reps/weights
+- Show completion message
+```
+
+### Security Considerations
+- Tokens should be long/random (UUID or 32-byte hex)
+- Set reasonable expiration (24-48 hours)
+- Mark as used after submission
+- No sensitive client data exposed
+- Rate limiting on submission endpoint
+
+## Technical Notes for Replit Implementation
+- Use Replit Database (key-value store) or Replit's PostgreSQL
+- Consider data relationships when using key-value structure
+- Implement proper indexing for quick last-workout lookups
+- Handle edge cases (first workout, missing data)
+
+## Database Advantages of This Structure
+1. **Flexible Sets**: Each set is individual record (handles 1-10+ sets)
+2. **Historical Tracking**: Complete workout history preserved
+3. **Template Reuse**: Quick workout setup via templates
+4. **Performance Queries**: Optimized for "last workout" lookups
+5. **Scalable**: Easy to add new clients, exercises, metrics
