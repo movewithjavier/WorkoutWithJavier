@@ -84,7 +84,7 @@ export default function ClientWorkout() {
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-2">Workout Complete!</h3>
               <p className="text-text-secondary mb-6">
-                Great job, {workoutData.client.name}! Your workout has been saved and your trainer will see your progress.
+                Great job, {workoutData?.client?.name || 'Client'}! Your workout has been saved and your trainer will see your progress.
               </p>
               <Button className="bg-primary hover:bg-primary-dark text-white">
                 View Your Progress
@@ -98,11 +98,11 @@ export default function ClientWorkout() {
 
   if (!workoutData) return null;
 
-  const currentExercise = workoutData.template.exercises[currentExerciseIndex];
-  const isLastExercise = currentExerciseIndex === workoutData.template.exercises.length - 1;
+  const currentExercise = workoutData?.template?.exercises?.[currentExerciseIndex];
+  const isLastExercise = currentExerciseIndex === (workoutData?.template?.exercises?.length || 0) - 1;
 
   const handleNextExercise = () => {
-    if (currentExerciseIndex < workoutData.template.exercises.length - 1) {
+    if (workoutData?.template?.exercises && currentExerciseIndex < workoutData.template.exercises.length - 1) {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
     } else {
       // Complete workout
@@ -117,11 +117,11 @@ export default function ClientWorkout() {
   };
 
   const handleSubmitWorkout = () => {
-    const exercises = workoutData.template.exercises.map((exercise: any, index: number) => ({
+    const exercises = workoutData?.template?.exercises?.map((exercise: any, index: number) => ({
       exerciseId: exercise.exerciseId,
       sets: exerciseData[index]?.sets || [],
       notes: exerciseData[index]?.notes || "",
-    }));
+    })) || [];
 
     submitWorkoutMutation.mutate({
       exercises,
@@ -160,7 +160,7 @@ export default function ClientWorkout() {
   };
 
   const usePreviousWeight = (setIndex: number) => {
-    if (currentExercise.lastPerformance[setIndex]) {
+    if (currentExercise?.lastPerformance?.[setIndex]) {
       const lastSet = currentExercise.lastPerformance[setIndex];
       updateSetData(currentExerciseIndex, setIndex, "reps", lastSet.reps);
       updateSetData(currentExerciseIndex, setIndex, "weightKg", lastSet.weightKg);
@@ -176,9 +176,9 @@ export default function ClientWorkout() {
             <i className="fas fa-dumbbell text-primary text-3xl"></i>
             <h1 className="text-2xl font-bold text-text-primary">WorkoutsWithJavier</h1>
           </div>
-          <h2 className="text-xl font-semibold text-text-primary mb-2">{workoutData.template.name}</h2>
+          <h2 className="text-xl font-semibold text-text-primary mb-2">{workoutData?.template?.name || 'Workout'}</h2>
           <p className="text-text-secondary">
-            Hi <span className="font-medium">{workoutData.client.name}</span>! Complete your workout below.
+            Hi <span className="font-medium">{workoutData?.client?.name || 'Client'}</span>! Complete your workout below.
           </p>
         </div>
 
@@ -186,12 +186,12 @@ export default function ClientWorkout() {
         <div className="mb-8">
           <div className="flex items-center justify-between text-sm text-text-secondary mb-2">
             <span>Progress</span>
-            <span>{currentExerciseIndex + 1} of {workoutData.template.exercises.length} exercises</span>
+            <span>{currentExerciseIndex + 1} of {workoutData?.template?.exercises?.length || 0} exercises</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${((currentExerciseIndex + 1) / workoutData.template.exercises.length) * 100}%` }}
+              style={{ width: `${((currentExerciseIndex + 1) / (workoutData?.template?.exercises?.length || 1)) * 100}%` }}
             ></div>
           </div>
         </div>
@@ -200,12 +200,12 @@ export default function ClientWorkout() {
         <Card className="mb-6">
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-text-primary mb-2">{currentExercise.exerciseName}</h3>
-              <p className="text-text-secondary">{currentExercise.exerciseInstructions}</p>
+              <h3 className="text-xl font-bold text-text-primary mb-2">{currentExercise?.exerciseName || 'Exercise'}</h3>
+              <p className="text-text-secondary">{currentExercise?.exerciseInstructions || 'No instructions available'}</p>
             </div>
 
             {/* Last Performance Display */}
-            {currentExercise.lastPerformance.length > 0 && (
+            {currentExercise?.lastPerformance && currentExercise.lastPerformance.length > 0 && (
               <div className="mb-6">
                 <h4 className="text-sm font-semibold text-text-secondary mb-3">Your Last Performance</h4>
                 <div className="grid grid-cols-3 gap-3">

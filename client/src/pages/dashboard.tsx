@@ -7,26 +7,24 @@ import { useState } from "react";
 import WorkoutSessionModal from "@/components/workout-session-modal";
 
 export default function Dashboard() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [selectedWorkout, setSelectedWorkout] = useState<{clientId: string, templateId: string, clientName: string, templateName: string} | null>(null);
 
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
     queryKey: ["/api/clients"],
-    enabled: !!user,
   });
 
   const { data: stats } = useQuery({
-    queryKey: ["/api/stats"],
-    enabled: !!user,
+    queryKey: ["/api/stats", clients],
     queryFn: async () => {
       // Calculate stats from clients
-      const activeClients = clients.length;
-      const weeklyWorkouts = clients.reduce((sum: number, client: any) => {
+      const activeClients = Array.isArray(clients) ? clients.length : 0;
+      const weeklyWorkouts = Array.isArray(clients) ? clients.reduce((sum: number, client: any) => {
         if (client.lastWorkout && client.lastWorkout.daysAgo <= 7) {
           return sum + 1;
         }
         return sum;
-      }, 0);
+      }, 0) : 0;
       
       return {
         activeClients,
@@ -37,7 +35,7 @@ export default function Dashboard() {
     },
   });
 
-  if (authLoading || clientsLoading) {
+  if (clientsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -81,14 +79,7 @@ export default function Dashboard() {
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <i className="fas fa-user text-white text-sm"></i>
                 </div>
-                <span className="font-medium">{user?.firstName || "Trainer"}</span>
-                <Button 
-                  variant="ghost"
-                  onClick={() => window.location.href = '/api/logout'}
-                  className="text-text-secondary hover:text-text-primary"
-                >
-                  <i className="fas fa-sign-out-alt"></i>
-                </Button>
+                <span className="font-medium">{user?.firstName || "Javier"}</span>
               </div>
             </div>
           </div>
@@ -178,7 +169,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="divide-y divide-gray-200">
-                {clients.slice(0, 5).map((client: any, index: number) => (
+                {Array.isArray(clients) && clients.slice(0, 5).map((client: any, index: number) => (
                   <div key={client.id} className="px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -214,7 +205,7 @@ export default function Dashboard() {
                   </div>
                 ))}
                 
-                {clients.length === 0 && (
+                {(!Array.isArray(clients) || clients.length === 0) && (
                   <div className="px-6 py-12 text-center">
                     <i className="fas fa-users text-gray-300 text-4xl mb-4"></i>
                     <p className="text-text-secondary mb-4">No clients yet</p>

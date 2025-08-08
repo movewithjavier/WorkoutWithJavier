@@ -12,23 +12,15 @@ import WorkoutSession from "@/pages/workout-session";
 import ClientWorkout from "@/pages/client-workout";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      {/* Public routes */}
+      {/* Public client workout route */}
       <Route path="/workout/:token" component={ClientWorkout} />
       
-      {/* Authenticated routes */}
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/clients" component={Clients} />
-          <Route path="/workout-session/:clientId/:templateId" component={WorkoutSession} />
-        </>
-      )}
+      {/* Main app routes (no auth required) */}
+      <Route path="/" component={Dashboard} />
+      <Route path="/clients" component={Clients} />
+      <Route path="/workout-session/:clientId/:templateId" component={WorkoutSession} />
       
       <Route component={NotFound} />
     </Switch>

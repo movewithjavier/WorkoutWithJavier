@@ -7,6 +7,7 @@ WorkoutsWithJavier is a workout tracker application designed for personal traine
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Authentication preferences: No login system needed - personal use only. Clients access workouts via shareable links without accounts.
 
 ## System Architecture
 
@@ -27,10 +28,10 @@ Preferred communication style: Simple, everyday language.
 - **Build Process**: esbuild for server bundling, separate from client build
 
 ### Authentication System
-- **Provider**: Replit Auth with OpenID Connect
-- **Strategy**: Passport.js with custom OpenID strategy
-- **Session Storage**: PostgreSQL-backed sessions using connect-pg-simple
-- **Security**: HTTP-only cookies with secure flags for production
+- **Status**: No authentication required (removed per user request)
+- **Access**: Direct access to trainer dashboard without login
+- **Client Access**: Public workout links for clients to input data without accounts
+- **Fixed User**: System operates with fixed trainer ID "trainer-1" (Javier)
 
 ### Database Design
 - **Database**: PostgreSQL with Neon serverless driver
@@ -71,10 +72,7 @@ Preferred communication style: Simple, everyday language.
 - **Icons**: Lucide React icons, Font Awesome for additional icons
 - **Fonts**: Google Fonts (Roboto) integration
 
-### Authentication and Session Management
-- **Auth Provider**: Replit OpenID Connect authentication
-- **Session Store**: connect-pg-simple for PostgreSQL session storage
-- **Auth Library**: Passport.js with OpenID client strategy
+
 
 ### Data Management
 - **Client State**: TanStack React Query for server state management

@@ -15,25 +15,19 @@ import {
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
+  // Simple auth endpoint for compatibility (no auth required)
+  app.get('/api/auth/user', async (req: any, res) => {
+    res.json({ 
+      id: 'trainer-1', 
+      firstName: 'Javier', 
+      email: 'javier@workouts.com' 
+    });
   });
 
-  // Client routes
-  app.get('/api/clients', isAuthenticated, async (req: any, res) => {
+  // Client routes (no auth required)
+  app.get('/api/clients', async (req: any, res) => {
     try {
-      const trainerId = req.user.claims.sub;
+      const trainerId = 'trainer-1'; // Fixed trainer ID since no auth
       const clients = await storage.getClients(trainerId);
       
       // Get last workout info for each client
@@ -58,9 +52,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/clients', isAuthenticated, async (req: any, res) => {
+  app.post('/api/clients', async (req: any, res) => {
     try {
-      const trainerId = req.user.claims.sub;
+      const trainerId = 'trainer-1'; // Fixed trainer ID since no auth
       const clientData = insertClientSchema.parse({ ...req.body, trainerId });
       const client = await storage.createClient(clientData);
       res.json(client);
@@ -70,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/clients/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/clients/:id', async (req, res) => {
     try {
       const client = await storage.getClient(req.params.id);
       if (!client) {
@@ -84,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Exercise routes
-  app.get('/api/exercises', isAuthenticated, async (req, res) => {
+  app.get('/api/exercises', async (req, res) => {
     try {
       const exercises = await storage.getExercises();
       res.json(exercises);
@@ -94,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/exercises', isAuthenticated, async (req, res) => {
+  app.post('/api/exercises', async (req, res) => {
     try {
       const exerciseData = insertExerciseSchema.parse(req.body);
       const exercise = await storage.createExercise(exerciseData);
@@ -106,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Workout template routes
-  app.get('/api/clients/:clientId/templates', isAuthenticated, async (req, res) => {
+  app.get('/api/clients/:clientId/templates', async (req, res) => {
     try {
       const templates = await storage.getWorkoutTemplates(req.params.clientId);
       res.json(templates);
@@ -116,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/clients/:clientId/templates', isAuthenticated, async (req, res) => {
+  app.post('/api/clients/:clientId/templates', async (req, res) => {
     try {
       const templateData = insertWorkoutTemplateSchema.parse({
         ...req.body,
@@ -130,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/templates/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/templates/:id', async (req, res) => {
     try {
       const template = await storage.getWorkoutTemplateWithExercises(req.params.id);
       if (!template) {
@@ -144,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Template exercise routes
-  app.post('/api/templates/:templateId/exercises', isAuthenticated, async (req, res) => {
+  app.post('/api/templates/:templateId/exercises', async (req, res) => {
     try {
       const templateExerciseData = insertTemplateExerciseSchema.parse({
         ...req.body,
@@ -159,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Workout routes
-  app.get('/api/clients/:clientId/workouts', isAuthenticated, async (req, res) => {
+  app.get('/api/clients/:clientId/workouts', async (req, res) => {
     try {
       const workouts = await storage.getWorkouts(req.params.clientId);
       res.json(workouts);
@@ -169,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/workouts', isAuthenticated, async (req, res) => {
+  app.post('/api/workouts', async (req, res) => {
     try {
       const workoutData = insertWorkoutSchema.parse(req.body);
       const workout = await storage.createWorkout(workoutData);
@@ -181,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get last performance for exercise
-  app.get('/api/clients/:clientId/exercises/:exerciseId/last-performance', isAuthenticated, async (req, res) => {
+  app.get('/api/clients/:clientId/exercises/:exerciseId/last-performance', async (req, res) => {
     try {
       const lastPerformance = await storage.getLastWorkoutForClient(
         req.params.clientId,
@@ -195,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Workout exercise routes
-  app.post('/api/workout-exercises', isAuthenticated, async (req, res) => {
+  app.post('/api/workout-exercises', async (req, res) => {
     try {
       const workoutExerciseData = insertWorkoutExerciseSchema.parse(req.body);
       const workoutExercise = await storage.createWorkoutExercise(workoutExerciseData);
@@ -207,7 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Set routes
-  app.post('/api/sets', isAuthenticated, async (req, res) => {
+  app.post('/api/sets', async (req, res) => {
     try {
       const setData = insertSetSchema.parse(req.body);
       const set = await storage.createSet(setData);
@@ -219,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Shared workout link routes
-  app.post('/api/clients/:clientId/templates/:templateId/share', isAuthenticated, async (req, res) => {
+  app.post('/api/clients/:clientId/templates/:templateId/share', async (req, res) => {
     try {
       const linkData = insertSharedWorkoutLinkSchema.parse({
         clientId: req.params.clientId,
@@ -323,10 +317,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.createSet({
               workoutExerciseId: workoutExercise.id,
               setNumber: set.setNumber,
-              reps: parseInt(set.reps),
-              weightKg: parseFloat(set.weightKg),
-              restSeconds: set.restSeconds ? parseInt(set.restSeconds) : null,
-              rpe: set.rpe ? parseInt(set.rpe) : null,
+              reps: parseInt(set.reps.toString()),
+              weightKg: parseFloat(set.weightKg.toString()),
+              restSeconds: set.restSeconds ? parseInt(set.restSeconds.toString()) : null,
+              rpe: set.rpe ? parseInt(set.rpe.toString()) : null,
               notes: set.notes,
             });
           }

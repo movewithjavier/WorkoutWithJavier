@@ -11,7 +11,6 @@ import { Link } from "wouter";
 
 export default function WorkoutSession() {
   const { clientId, templateId } = useParams();
-  const { user } = useAuth();
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [exerciseData, setExerciseData] = useState<any>({});
 
@@ -54,11 +53,11 @@ export default function WorkoutSession() {
     );
   }
 
-  const currentExercise = template.exercises[currentExerciseIndex];
-  const isLastExercise = currentExerciseIndex === template.exercises.length - 1;
+  const currentExercise = template?.exercises?.[currentExerciseIndex];
+  const isLastExercise = currentExerciseIndex === (template?.exercises?.length || 0) - 1;
 
   const handleNextExercise = () => {
-    if (currentExerciseIndex < template.exercises.length - 1) {
+    if (template?.exercises && currentExerciseIndex < template.exercises.length - 1) {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
     }
   };
@@ -84,9 +83,9 @@ export default function WorkoutSession() {
               </Link>
             </div>
             <div className="text-center">
-              <h1 className="text-lg font-bold text-text-primary">{template.name} - {client.name}</h1>
+              <h1 className="text-lg font-bold text-text-primary">{template?.name || 'Workout'} - {client?.name || 'Client'}</h1>
               <p className="text-sm text-text-secondary">
-                Exercise {currentExerciseIndex + 1} of {template.exercises.length}
+                Exercise {currentExerciseIndex + 1} of {template?.exercises?.length || 0}
               </p>
             </div>
             <div className="w-32"></div>
@@ -100,12 +99,12 @@ export default function WorkoutSession() {
         <div className="mb-8">
           <div className="flex items-center justify-between text-sm text-text-secondary mb-2">
             <span>Progress</span>
-            <span>{currentExerciseIndex + 1} of {template.exercises.length} exercises</span>
+            <span>{currentExerciseIndex + 1} of {template?.exercises?.length || 0} exercises</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${((currentExerciseIndex + 1) / template.exercises.length) * 100}%` }}
+              style={{ width: `${((currentExerciseIndex + 1) / (template?.exercises?.length || 1)) * 100}%` }}
             ></div>
           </div>
         </div>
@@ -114,8 +113,8 @@ export default function WorkoutSession() {
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-text-primary mb-2">{currentExercise.exerciseName}</h3>
-              <p className="text-text-secondary">{currentExercise.exerciseInstructions}</p>
+              <h3 className="text-xl font-bold text-text-primary mb-2">{currentExercise?.exerciseName || 'Exercise'}</h3>
+              <p className="text-text-secondary">{currentExercise?.exerciseInstructions || 'No instructions available'}</p>
             </div>
 
             {/* Last Performance */}

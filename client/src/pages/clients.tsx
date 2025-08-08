@@ -24,7 +24,6 @@ export default function Clients() {
 
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["/api/clients"],
-    enabled: !!user,
   });
 
   const addClientMutation = useMutation({
@@ -162,14 +161,7 @@ export default function Clients() {
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <i className="fas fa-user text-white text-sm"></i>
                 </div>
-                <span className="font-medium">{user?.firstName || "Trainer"}</span>
-                <Button 
-                  variant="ghost"
-                  onClick={() => window.location.href = '/api/logout'}
-                  className="text-text-secondary hover:text-text-primary"
-                >
-                  <i className="fas fa-sign-out-alt"></i>
-                </Button>
+                <span className="font-medium">{user?.firstName || "Javier"}</span>
               </div>
             </div>
           </div>
@@ -204,7 +196,7 @@ export default function Clients() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clients.map((client: any, index: number) => (
+            {Array.isArray(clients) && clients.map((client: any, index: number) => (
               <Card key={client.id} className="hover:shadow-lg transition-shadow duration-200">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
