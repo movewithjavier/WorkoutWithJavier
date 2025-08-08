@@ -1,0 +1,22 @@
+[
+  {
+    "id": "2f3001aa-398b-4687-b0b9-551e2c7edf55",
+    "trainerId": "trainer-1",
+    "name": "Cel Manotok",
+    "email": "",
+    "phone": "",
+    "notes": "",
+    "createdAt": "2025-08-08T07:31:28.002Z",
+    "updatedAt": "2025-08-08T07:31:28.002Z"
+  },
+  {
+    "id": "b46e8371-69ec-4ace-a6f1-2aa2db82ca8a",
+    "trainerId": "trainer-1",
+    "name": "Jan Parales",
+    "email": "",
+    "phone": "",
+    "notes": "",
+    "createdAt": "2025-08-08T07:44:52.201Z",
+    "updatedAt": "2025-08-08T07:44:52.201Z"
+  }
+]

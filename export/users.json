@@ -1,0 +1,11 @@
+[
+  {
+    "id": "trainer-1",
+    "email": "javier@workouts.com",
+    "firstName": "Javier",
+    "lastName": null,
+    "profileImageUrl": null,
+    "createdAt": "2025-08-08T07:30:32.416Z",
+    "updatedAt": "2025-08-08T07:30:32.416Z"
+  }
+]
